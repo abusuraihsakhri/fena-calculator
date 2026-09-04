@@ -18,6 +18,10 @@ import json
 import sys
 from typing import Dict, Any
 
+from agents.base import AuditLogger, PHIGuard, SecurityException
+from agents.models import SystemTaskPayload
+from agents.supervisor import SystemSupervisor
+
 
 def calc_fena(urine_na: float, plasma_cr: float, plasma_na: float,
               urine_cr: float) -> Dict[str, Any]:
@@ -373,6 +377,27 @@ def main(argv=None):
     p_full.add_argument("--urine-osm", type=float, default=None, help="Urine Osm (mOsm/kg)")
     p_full.add_argument("--sg", type=float, default=None, help="Specific gravity")
 
+    # Audit (supervisor task evaluation)
+    p_audit = sub.add_parser("audit", help="Run supervisor audit on a task payload")
+    p_audit.add_argument("--task-id", required=True, help="Task identifier")
+    p_audit.add_argument("--target-id", default="SPECIMEN-001", help="Target identifier")
+    p_audit.add_argument("--primary-metric", type=float, default=10.0, help="Primary measurement")
+    p_audit.add_argument("--secondary-metric", type=float, default=4.0, help="Secondary metric")
+    p_audit.add_argument("--status-descriptor", default="NOMINAL", help="Status descriptor")
+    p_audit.add_argument("--critical", action="store_true", help="Flag as critical")
+
+    # Chat (supervisory LLM query)
+    p_chat = sub.add_parser("chat", help="Query the supervisory LLM")
+    p_chat.add_argument("query", nargs="+", help="Query text for the LLM")
+
+    # Verify audit integrity
+    p_verify = sub.add_parser("verify-audit", help="Verify HMAC-SHA256 audit trail integrity")
+
+    # Serve (FastAPI REST API)
+    p_serve = sub.add_parser("serve", help="Start FastAPI REST API server")
+    p_serve.add_argument("--host", default="0.0.0.0", help="Bind host")
+    p_serve.add_argument("--port", type=int, default=8000, help="Bind port")
+
     args = parser.parse_args(argv)
 
     if args.command == "fena":
@@ -389,11 +414,44 @@ def main(argv=None):
         result = full_aki_assessment(args.urine_na, args.plasma_cr, args.plasma_na,
                                       args.urine_cr, args.bun, args.urine_urea,
                                       args.urine_osm, 285.0, args.sg)
+    elif args.command == "audit":
+        supervisor = SystemSupervisor(model_provider="mock")
+        payload = SystemTaskPayload(
+            task_id=args.task_id,
+            target_identifier=args.target_id,
+            primary_metric=args.primary_metric,
+            secondary_metric=args.secondary_metric,
+            status_descriptor=args.status_descriptor,
+            is_critical_flag=args.critical,
+        )
+        dossier = supervisor.process_task(payload)
+        result = dossier.to_dict()
+    elif args.command == "chat":
+        supervisor = SystemSupervisor(model_provider="mock")
+        query = " ".join(args.query)
+        try:
+            response = supervisor.query_supervisory_chat(query)
+        except SecurityException as e:
+            print(json.dumps({"error": str(e)}))
+            return 1
+        result = {"response": response}
+    elif args.command == "verify-audit":
+        verified = AuditLogger.verify_integrity()
+        result = {
+            "audit_integrity_verified": verified,
+            "total_blocks": len(AuditLogger.get_trail()),
+            "algorithm": "HMAC-SHA256",
+        }
+    elif args.command == "serve":
+        import uvicorn
+        from agents.api import app
+        uvicorn.run(app, host=args.host, port=args.port)
+        return 0
     else:
         parser.print_help()
         return 1
 
-    print(json.dumps(result, indent=2))
+    print(json.dumps(result, indent=2, default=str))
     return 0
 
 

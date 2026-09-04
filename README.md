@@ -1,6 +1,6 @@
 # FENA Calculator
 
-> **Domain:** Nephrology & Renal Replacement Protocols  
+> **Domain:** Nephrology & Renal Replacement Protocols
 > **Reference Guidelines & Standards:** `KDIGO & KDOQI Clinical Guidelines`
 
 <div align="center">
@@ -18,17 +18,17 @@
 
 ## 📖 What It Does
 
-Fractional Excretion of Sodium (FENa) Calculator
+Fractional Excretion of Sodium (FENa) Calculator for clinical nephrology decision support.
 
 Real implementations for:
-- FENa = (UNa × PCr) / (PNa × UCr) × 100
-- FEUrea (for patients on diuretics)
-- BUN/Creatinine ratio
-- Urine osmolality interpretation
-- Specific gravity interpretation
+- **FENa** = (UNa × PCr) / (PNa × UCr) × 100
+- **FEUrea** (for patients on diuretics)
+- **BUN/Creatinine ratio**
+- **Urine osmolality interpretation**
+- **Specific gravity interpretation**
+- **Full AKI differential assessment**
 
 References: Miller TR et al. (JAMA 1978), Carvounis CP et al. (Kidney Int 2002)
-Stdlib only.
 
 ---
 
@@ -37,140 +37,129 @@ Stdlib only.
 ### 🔬 Analytical Functions
 
 - **`calc_fena()`**: Fractional Excretion of Sodium (FENa).
+  - FENa < 1%: Prerenal azotemia
+  - FENa 1-2%: Indeterminate
+  - FENa > 2%: Intrinsic renal disease (ATN)
 
-FENa = (UNa × PCr) / (PNa × UCr) × 100
-
-Interpretation:
-    FENa < 1%: Prerenal azotemia (volume depletion, CHF, hepatorenal)
-    FENa 1-2%: Indeterminate
-    FENa > 2%: Intrinsic renal disease (ATN)
-
-Args:
-    urine_na: Urine sodium (mEq/L)
-    plasma_cr: Plasma/Serum creatinine (mg/dL)
-    plasma_na: Plasma/Serum sodium (mEq/L)
-    urine_cr: Urine creatinine (mg/dL)
-
-Returns:
-    Dict with FENa percentage and interpretation
 - **`calc_feurea()`**: Fractional Excretion of Urea (FEUrea).
+  - More reliable than FENa in patients on diuretics.
+  - FEUrea < 35%: Prerenal azotemia
+  - FEUrea 35-50%: Indeterminate
+  - FEUrea > 50%: Intrinsic renal disease (ATN)
 
-FEUrea = (UUrea × PCr) / (PUrea × UCr) × 100
-
-More reliable than FENa in patients on diuretics.
-
-Interpretation:
-    FEUrea < 35%: Prerenal azotemia
-    FEUrea 35-50%: Indeterminate
-    FEUrea > 50%: Intrinsic renal disease (ATN)
-
-Args:
-    urine_urea: Urine urea nitrogen (mg/dL)
-    plasma_cr: Plasma creatinine (mg/dL)
-    plasma_urea: Plasma/BUN (mg/dL)
-    urine_cr: Urine creatinine (mg/dL)
-
-Returns:
-    Dict with FEUrea percentage and interpretation
 - **`calc_bun_cr_ratio()`**: BUN/Creatinine ratio for prerenal vs intrinsic differentiation.
+  - BUN:Cr > 20:1: Prerenal
+  - BUN:Cr 15-20:1: Indeterminate
+  - BUN:Cr < 15:1: Intrinsic renal
 
-BUN:Cr > 20:1: Prerenal (increased urea reabsorption)
-BUN:Cr 15-20:1: Indeterminate
-BUN:Cr < 15:1: Intrinsic renal (normal or decreased reabsorption)
-
-Args:
-    bun: Blood urea nitrogen (mg/dL)
-    creatinine: Serum creatinine (mg/dL)
-
-Returns:
-    Dict with BUN/Cr ratio and interpretation
 - **`interpret_urine_osmolality()`**: Urine osmolality interpretation for AKI differential.
+  - Prerenal: UOsm > 500 mOsm/kg
+  - Intrinsic (ATN): UOsm < 350 mOsm/kg
 
-Prerenal: UOsm > 500 mOsm/kg (concentrated urine)
-Intrinsic (ATN): UOsm < 350 mOsm/kg (dilute/isotonic urine)
-Normal range: 300-900 mOsm/kg
-
-Also calculates UOsm/SOsm ratio.
-
-Args:
-    urine_osmolality: Urine osmolality (mOsm/kg)
-    serum_osmolality: Serum osmolality (mOsm/kg)
-
-Returns:
-    Dict with interpretation
 - **`interpret_specific_gravity()`**: Urine specific gravity interpretation.
+  - Prerenal: > 1.020 (concentrated)
+  - ATN: ~1.010 (isosthenuria)
 
-Normal: 1.005-1.030
-Prerenal: > 1.020 (concentrated)
-ATN: ~1.010 (isosthenuria - fixed at plasma SG)
-
-Args:
-    sg: Urine specific gravity
-
-Returns:
-    Dict with interpretation
+- **`full_aki_assessment()`**: Complete AKI differential combining all markers with overall assessment.
 
 ---
 
-## 📐 Mathematical Formulation & Logic
+## 💻 Installation
 
-```text
-  Also calculates UOsm/SOsm ratio.
-  p_fena = sub.add_parser("fena", help="Calculate FENa")
-  p_feu = sub.add_parser("feurea", help="Calculate FEUrea")
+```bash
+# Clone the repository
+git clone https://github.com/abusuraihsakhri/fena-calculator.git
+cd fena-calculator
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
 ---
 
 ## 💻 CLI Quickstart & Usage
 
-### 1. Guided Interactive Mode
+### 1. Calculate FENa
 ```bash
-python cli.py
+python cli.py fena --urine-na 10 --plasma-cr 2.0 --plasma-na 140 --urine-cr 200
 ```
 
-### 2. Direct Parameterized Evaluation
+### 2. Calculate FEUrea
 ```bash
-python cli.py --input data.csv
+python cli.py feurea --urine-urea 1000 --plasma-cr 2.0 --plasma-bun 60 --urine-cr 200
 ```
 
-### Parameter Reference
-- `--interactive`: Launch guided terminal interactive wizard.
-- `--input <path>`: Evaluate input from JSON or CSV specification.
-- `--json`: Output deterministic structured results in JSON format.
+### 3. BUN/Creatinine Ratio
+```bash
+python cli.py bun-cr --bun 60 --cr 2.0
+```
 
-### Input Data Schema
+### 4. Urine Osmolality
+```bash
+python cli.py osmolality --urine-osm 600 --serum-osm 285
+```
 
-| Field | Description | Requirement |
-|:------|:------------|:------------|
-| `id` | Parameter / observation metric | Required |
-| `value` | Parameter / observation metric | Required |
-| `qty` | Parameter / observation metric | Required |
+### 5. Specific Gravity
+```bash
+python cli.py sg --sg 1.025
+```
+
+### 6. Full AKI Assessment
+```bash
+python cli.py full --urine-na 10 --plasma-cr 2.0 --plasma-na 140 --urine-cr 200 --bun 60
+```
+
+### 7. Supervisor Audit
+```bash
+python cli.py audit --task-id TASK-001 --primary-metric 10.0
+```
+
+### 8. Verify Audit Integrity
+```bash
+python cli.py verify-audit
+```
+
+### 9. Start REST API Server
+```bash
+python cli.py serve --host 0.0.0.0 --port 8000
+```
 
 ---
 
 ## 🛡️ Security & Enterprise Architecture
 
-* **Zero-PHI Outbound Interceptor:** Active AST and regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
-* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances (`llama3`, `mistral`), Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
-* **Active Learning Bayesian Calibration:** Dynamic tracker updating worker reliability weights and monitoring Brier calibration drift.
-* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
+* **Zero-PHI Outbound Interceptor:** Active regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
+* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation.
+* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances, Claude, GPT-4o, and deterministic test mocks.
+* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI REST endpoints and operational Prometheus metrics (`/metrics`).
+
+### Environment Variables
+
+| Variable | Required | Description |
+|:---------|:---------|:------------|
+| `AUDIT_SECRET_KEY` | Yes | HMAC-SHA256 signing key. Generate with `python -c "import secrets; print(secrets.token_hex(32))"` |
+| `MODEL_PROVIDER` | No | LLM provider: `mock` (default), `ollama`, `claude`, `openai` |
+
+Copy `.env.example` to `.env` and set your values before running.
 
 ---
 
 ## 🧪 Testing & Verification
 
-Run the automated test suite:
-
 ```bash
+# Run all tests
 pytest -v
-```
 
-Execute high-throughput batch simulation benchmarks:
+# Run specific test files
+pytest test_fena.py -v
+pytest tests/ -v
 
-```bash
-python simulator.py --tasks 1000 --concurrency 8
+# Execute simulation benchmark
+python simulator.py 1000
 ```
 
 ---
@@ -178,6 +167,43 @@ python simulator.py --tasks 1000 --concurrency 8
 ## 🐳 Container Deployment
 
 ```bash
+# Build and run with Docker Compose
+cp .env.example .env
+# Edit .env and set AUDIT_SECRET_KEY
+docker-compose up --build
+
+# Or build and run manually
 docker build -t fena-calculator .
-docker run -p 8000:8000 fena-calculator
+docker run -p 8000:8000 -e AUDIT_SECRET_KEY=your-secret-key fena-calculator
+```
+
+---
+
+## 📁 Project Structure
+
+```
+fena-calculator/
+├── fena.py                 # Core calculation functions + CLI
+├── cli.py                  # CLI entry point (delegates to fena.py)
+├── test_fena.py            # Core calculation tests
+├── simulator.py            # High-throughput simulation
+├── enrichment.py           # Feature enrichment engines
+├── requirements.txt        # Python dependencies
+├── Dockerfile              # Container build
+├── docker-compose.yml      # Container orchestration
+├── agents/                 # Enterprise agent modules
+│   ├── base.py             # Security, PHI guard, audit trail
+│   ├── models.py           # Pydantic schemas
+│   ├── supervisor.py       # Orchestrator
+│   ├── workers.py          # Specialized workers
+│   ├── api.py              # FastAPI REST server
+│   ├── llm_factory.py      # LLM provider factory
+│   ├── metrics.py          # Prometheus metrics
+│   ├── learning.py         # Bayesian calibration
+│   └── streamer.py         # WebSocket telemetry
+├── tests/                  # Test suite
+│   ├── test_fena_calculator.py
+│   └── test_enrichment.py
+└── web/                    # Operations console
+    └── index.html
 ```

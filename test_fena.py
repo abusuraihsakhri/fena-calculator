@@ -1,3 +1,6 @@
+import os
+os.environ.setdefault("AUDIT_SECRET_KEY", "test-audit-key-not-for-production")
+
 import pytest
 from fena import (
     calc_fena,

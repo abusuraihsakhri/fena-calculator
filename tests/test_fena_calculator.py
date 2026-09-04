@@ -3,8 +3,13 @@ Automated Pytest Test Suite for Fena Calculator.
 Domain: Clinical & Biomedical AI
 Standard: CAP / CLSI / ISO Standards
 """
+import os
 import sys
 from pathlib import Path
+
+# Set required environment variables before importing agents
+os.environ.setdefault("AUDIT_SECRET_KEY", "test-audit-key-not-for-production")
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
