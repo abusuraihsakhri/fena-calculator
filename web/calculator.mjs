@@ -33,7 +33,9 @@ export function calculateBunCr({ bun, serumCr }) {
 export function calculateUrineOsm({ urineOsm, serumOsm = 285 }) {
   finite(urineOsm, 'Urine osmolality', { allowZero: true });
   finite(serumOsm, 'Serum osmolality');
-  return { value: urineOsm, ratio: urineOsm / serumOsm, category: urineOsm > 500 ? 'prerenal' : urineOsm >= 350 ? 'indeterminate' : 'intrinsic' };
+  const ratio = urineOsm / serumOsm;
+  if (!Number.isFinite(ratio)) throw new RangeError('Result is outside supported numeric range.');
+  return { value: urineOsm, ratio, category: urineOsm > 500 ? 'prerenal' : urineOsm >= 350 ? 'indeterminate' : 'intrinsic' };
 }
 export function calculateSpecificGravity(sg) {
   finite(sg, 'Urine specific gravity');
