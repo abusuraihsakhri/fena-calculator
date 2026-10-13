@@ -58,3 +58,10 @@ test('optional indices and unrounded threshold classification', () => {
   assert.equal(r.urineOsm.category, 'indeterminate');
   assert.equal(r.sg.category, 'intrinsic');
 });
+
+test('reject overflowing derived ratios', () => {
+  assert.throws(() => calculateFena({ urineNa: 1e308, serumCr: 1e308, serumNa: 1e-308, urineCr: 1e-308 }), RangeError);
+  assert.throws(() => calculateFeurea({ urineUrea: 1e308, serumCr: 1e308, bun: 1e-308, urineCr: 1e-308 }), RangeError);
+  assert.throws(() => calculateBunCr({ bun: 1e308, serumCr: 1e-308 }), RangeError);
+  assert.throws(() => calculateUrineOsm({ urineOsm: 1e308, serumOsm: 1e-308 }), RangeError);
+});
