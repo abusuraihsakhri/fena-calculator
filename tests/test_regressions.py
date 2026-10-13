@@ -66,3 +66,13 @@ def test_nested_metadata_phi_guard():
     )
     with pytest.raises(SecurityException):
         supervisor.process_task(payload)
+
+def test_overflow_in_calculated_results_is_rejected():
+    with pytest.raises(ValueError):
+        calc_fena(1e308, 1e308, 1e-308, 1e-308)
+    with pytest.raises(ValueError):
+        calc_feurea(1e308, 1e308, 1e-308, 1e-308)
+    with pytest.raises(ValueError):
+        calc_bun_cr_ratio(1e308, 1e-308)
+    with pytest.raises(ValueError):
+        interpret_urine_osmolality(1e308, 1e-308)
