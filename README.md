@@ -1,5 +1,7 @@
 # FENa Calculator
 
+### [Open the Live Application →](https://abusuraihsakhri.github.io/fena-calculator/)
+
 An educational nephrology calculator for fractional excretion of sodium (FENa), fractional excretion of urea (FEUrea), and supporting urinary indices. A browser application and Python CLI use the same standard arithmetic expressions; the browser version needs no Python runtime or server.
 
 ## Browser application
