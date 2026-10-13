@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Fena Calculator API",
-    "description": "Enterprise Distributed Component Platform (Clinical & Cryptographic AI) adhering to CAP / CLSI / NIST Standards.",
-    "version": "3.0.0-ENTERPRISE",
+    "description": "Demonstration task audit API (not a validated clinical decision system). The browser calculator runs locally without API calls.",
+    "version": "3.0.0",
     "contact": {
       "name": "Dr. Abu Suraih Sakhri",
       "url": "https://github.com/abusuraihsakhri"
@@ -22,10 +22,10 @@
     },
     "/metrics": {
       "get": {
-        "summary": "Prometheus operational metrics",
+        "summary": "In-memory JSON task and audit counts",
         "responses": {
           "200": {
-            "description": "Prometheus text metrics"
+            "description": "JSON counts (not Prometheus exposition format)"
           }
         }
       }
@@ -76,7 +76,7 @@
     },
     "/api/chat": {
       "post": {
-        "summary": "Air-gapped supervisory conversational assistant",
+        "summary": "Deterministic mock provider response",
         "requestBody": {
           "content": {
             "application/json": {
@@ -103,10 +103,13 @@
     },
     "/api/audit/logs": {
       "get": {
-        "summary": "Retrieve and cryptographically verify HMAC audit trail",
+        "summary": "Read signed in-memory audit metadata (requires X-Audit-Read-Token header)",
         "responses": {
           "200": {
             "description": "Cryptographic audit trail"
+          },
+          "403": {
+            "description": "Token not configured or unauthorized"
           }
         }
       }
