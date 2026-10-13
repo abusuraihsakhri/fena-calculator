@@ -16,7 +16,7 @@ supervisor = SystemSupervisor(model_provider="mock")
 
 app = FastAPI(
     title="Fena Calculator API",
-    description="Enterprise Distributed Component Platform (Clinical & Biomedical AI)",
+    description="Demonstration task-audit API; no clinical validation or production PHI safeguards.",
     version="3.0.0",
 )
 
@@ -27,7 +27,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "HEALTHY", "service": "fena-calculator", "domain": "Clinical & Biomedical AI", "standard": "CAP / CLSI / ISO Standards", "version": "3.0.0-ENTERPRISE"}
+    return {"status": "healthy", "service": "fena-calculator", "version": "3.0.0", "validated_for_clinical_use": False}
 
 
 @app.get("/metrics")
