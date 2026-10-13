@@ -15,12 +15,20 @@ Stdlib only.
 
 import argparse
 import json
+import math
 import sys
 from typing import Dict, Any
 
 from agents.base import AuditLogger, PHIGuard, SecurityException
 from agents.models import SystemTaskPayload
 from agents.supervisor import SystemSupervisor
+
+
+def _require_finite(**values):
+    """Reject NaN and infinities before any clinical thresholds are applied."""
+    for label, value in values.items():
+        if not isinstance(value, (float, int)) or not math.isfinite(value):
+            raise ValueError(f"{label} must be a finite number")
 
 
 def calc_fena(urine_na: float, plasma_cr: float, plasma_na: float,
@@ -44,6 +52,8 @@ def calc_fena(urine_na: float, plasma_cr: float, plasma_na: float,
     Returns:
         Dict with FENa percentage and interpretation
     """
+    _require_finite(urine_na=urine_na, plasma_cr=plasma_cr,
+                    plasma_na=plasma_na, urine_cr=urine_cr)
     if plasma_na <= 0:
         raise ValueError("Plasma sodium must be positive")
     if urine_cr <= 0:
@@ -112,6 +122,8 @@ def calc_feurea(urine_urea: float, plasma_cr: float,
     Returns:
         Dict with FEUrea percentage and interpretation
     """
+    _require_finite(urine_urea=urine_urea, plasma_cr=plasma_cr,
+                    plasma_urea=plasma_urea, urine_cr=urine_cr)
     if plasma_urea <= 0:
         raise ValueError("Plasma BUN must be positive")
     if urine_cr <= 0:
@@ -162,6 +174,7 @@ def calc_bun_cr_ratio(bun: float, creatinine: float) -> Dict[str, Any]:
     Returns:
         Dict with BUN/Cr ratio and interpretation
     """
+    _require_finite(bun=bun, creatinine=creatinine)
     if creatinine <= 0:
         raise ValueError("Creatinine must be positive")
     if bun < 0:
@@ -212,6 +225,10 @@ def interpret_urine_osmolality(urine_osmolality: float,
     Returns:
         Dict with interpretation
     """
+    _require_finite(urine_osmolality=urine_osmolality,
+                    serum_osmolality=serum_osmolality)
+    if urine_osmolality < 0:
+        raise ValueError("Urine osmolality cannot be negative")
     if serum_osmolality <= 0:
         raise ValueError("Serum osmolality must be positive")
 
@@ -250,6 +267,7 @@ def interpret_specific_gravity(sg: float) -> Dict[str, Any]:
     Returns:
         Dict with interpretation
     """
+    _require_finite(sg=sg)
     if sg < 1.000:
         raise ValueError("Specific gravity must be ≥ 1.000")
 
@@ -294,27 +312,27 @@ def full_aki_assessment(urine_na: float, plasma_cr: float, plasma_na: float,
         result["specific_gravity"] = interpret_specific_gravity(specific_gravity)
 
     # Overall assessment
-    fena_val = result["fena"]["fena_percent"]
-    bun_ratio = result["bun_cr_ratio"]["bun_cr_ratio"]
+    fena_pattern = result["fena"]["interpretation"]
+    bun_pattern = result["bun_cr_ratio"]["interpretation"]
 
     prerenal_signals = 0
     intrinsic_signals = 0
 
-    if fena_val < 1:
+    if fena_pattern == "Prerenal azotemia":
         prerenal_signals += 1
-    elif fena_val > 2:
+    elif fena_pattern == "Intrinsic renal disease (ATN)":
         intrinsic_signals += 1
 
-    if bun_ratio > 20:
+    if bun_pattern == "Prerenal pattern":
         prerenal_signals += 1
-    elif bun_ratio < 15:
+    elif bun_pattern == "Intrinsic renal pattern":
         intrinsic_signals += 1
 
     if "feurea" in result:
-        feurea_val = result["feurea"]["feurea_percent"]
-        if feurea_val < 35:
+        feurea_pattern = result["feurea"]["interpretation"]
+        if feurea_pattern == "Prerenal azotemia":
             prerenal_signals += 1
-        elif feurea_val > 50:
+        elif feurea_pattern == "Intrinsic renal disease":
             intrinsic_signals += 1
 
     if prerenal_signals > intrinsic_signals:
