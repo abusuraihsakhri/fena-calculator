@@ -1,7 +1,7 @@
 /** Browser-only calculations; no network requests or retained input. */
 function finite(value, name, { allowZero = false } = {}) {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || (!allowZero && value === 0)) {
-    throw new RangeError(${name} + ' must be a finite ' + (allowZero ? 'non-negative' : 'positive') + ' number.');
+    throw new RangeError(name + ' must be a finite ' + (allowZero ? 'non-negative' : 'positive') + ' number.');
   }
   return value;
 }
