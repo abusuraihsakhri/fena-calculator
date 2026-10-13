@@ -2,7 +2,11 @@
 FastAPI REST API Server for Fena Calculator.
 """
 from typing import Dict, Any, List
-from fastapi import FastAPI, HTTPException
+import hmac
+import os
+from pathlib import Path
+from fastapi import FastAPI, HTTPException, Header
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from .base import AuditLogger, PHIGuard
 from .models import SystemTaskPayload, ConsensusDossier
@@ -12,8 +16,8 @@ supervisor = SystemSupervisor(model_provider="mock")
 
 app = FastAPI(
     title="Fena Calculator API",
-    description="Enterprise Distributed Component Platform (Clinical & Biomedical AI)",
-    version="3.0.0-ENTERPRISE",
+    description="Demonstration task-audit API; no clinical validation or production PHI safeguards.",
+    version="3.0.0",
 )
 
 
@@ -23,7 +27,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "HEALTHY", "service": "fena-calculator", "domain": "Clinical & Biomedical AI", "standard": "CAP / CLSI / ISO Standards", "version": "3.0.0-ENTERPRISE"}
+    return {"status": "healthy", "service": "fena-calculator", "version": "3.0.0", "validated_for_clinical_use": False}
 
 
 @app.get("/metrics")
@@ -51,5 +55,13 @@ def api_chat(req: ChatRequest):
 
 
 @app.get("/api/audit/logs")
-def api_audit_logs():
+def api_audit_logs(x_audit_read_token: str | None = Header(default=None)):
+    """Audit details are restricted to callers holding a separate read token."""
+    expected = os.getenv("AUDIT_READ_TOKEN")
+    if not expected or not x_audit_read_token or not hmac.compare_digest(x_audit_read_token, expected):
+        raise HTTPException(status_code=403, detail="Audit log access is disabled or unauthorized")
     return {"audit_trail": AuditLogger.get_trail(), "verified": AuditLogger.verify_integrity()}
+
+
+# Static UI is optional: the API also remains usable without a browser.
+app.mount("/", StaticFiles(directory=str(Path(__file__).resolve().parents[1] / "web"), html=True), name="web")

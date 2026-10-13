@@ -1,236 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fena Calculator — Operations Console</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #090d16;
-            --card: #111827;
-            --border: #1f293d;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.25);
-            --text: #f3f4f6;
-            --text-muted: #9ca3af;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding: 2rem;
-            min-height: 100vh;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .header-title h1 { font-size: 1.6rem; font-weight: 700; color: #fff; }
-        .header-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: var(--accent-glow);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 1.5rem;
-        }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .card h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
-        input, select, textarea {
-            width: 100%;
-            padding: 0.65rem 0.9rem;
-            background: #0d1322;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #fff;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-        .btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 0.7rem 1.4rem;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-        }
-        .btn:hover { background: #2563eb; }
-        .terminal {
-            background: #060911;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: #10b981;
-            height: 380px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-        .metrics-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .metric-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .metric-val { font-size: 1.4rem; font-weight: 700; color: #fff; margin-top: 0.25rem; }
-        .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Calculate FENa, FEUrea and related urinary indices locally in your browser.">
+  <title>FENa Calculator | Renal Indices</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172b3d;background:#f4f7f9;line-height:1.48}
+    *{box-sizing:border-box}body{margin:0}main{max-width:1140px;margin:auto;padding:28px 20px 55px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px}
+    h1{font-size:clamp(1.65rem,2.8vw,2.3rem);letter-spacing:-.035em;margin:0}h2{font-size:1.12rem;margin:0 0 15px}
+    .subtitle{color:#516578;margin:5px 0 0;max-width:700px}.pill{border:1px solid #9fcdc0;color:#195c4f;background:#eaf7f2;border-radius:100px;padding:6px 10px;font-size:.76rem;white-space:nowrap;font-weight:650}
+    .layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:18px;align-items:start}
+    .panel{background:white;border:1px solid #dbe4eb;border-radius:14px;padding:23px;box-shadow:0 2px 10px #19354f07}
+    .group-heading{font-size:.83rem;text-transform:uppercase;letter-spacing:.075em;color:#476176;font-weight:750;margin:24px 0 12px}
+    .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    label{display:block;font-size:.86rem;font-weight:630;margin-bottom:6px;color:#293e50}.unit{font-weight:450;color:#617588}
+    input{width:100%;border:1px solid #afbdca;background:#fff;padding:11px 12px;border-radius:8px;font:inherit;color:#122c40;min-height:44px}
+    input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #8bb6ef;outline-offset:2px}
+    small{color:#5e7281;font-size:.78rem;display:block;margin-top:6px}
+    .actions{display:flex;gap:10px;margin-top:25px}.button{border-radius:8px;border:1px solid #0c5f96;background:#0c5f96;color:#fff;padding:11px 16px;font:inherit;font-weight:690;min-height:44px;cursor:pointer}
+    .button.secondary{color:#244c69;background:#eef5fa;border-color:#bdd2e0}.button:disabled{opacity:.45;cursor:not-allowed}
+    .actions .button:first-child{flex:1}.result-top{display:flex;gap:12px;justify-content:space-between;align-items:start}
+    .result-row{border-top:1px solid #e3ebf0;padding:16px 0}.result-row:first-child{border-top:0}.result-head{display:flex;justify-content:space-between;gap:14px;align-items:baseline}
+    .result-head strong{font-size:.9rem}.result-num{font-variant-numeric:tabular-nums;font-size:1.32rem;font-weight:750;color:#0b5587;white-space:nowrap}
+    .interpretation{color:#536878;font-size:.85rem;margin:5px 0 0}
+    .empty{border:1px dashed #b8c9d5;background:#f7fafc;border-radius:10px;padding:28px 16px;text-align:center;color:#536c7c}
+    .advisory{background:#fff7e7;border:1px solid #ead2a0;color:#624612;border-radius:10px;padding:13px 14px;font-size:.85rem;margin-top:18px}.advisory strong{display:block;margin-bottom:4px}
+    .reference{margin-top:16px;font-size:.83rem;color:#596e7d}.reference p{margin:5px 0}.error{color:#ad2738;font-weight:600;font-size:.86rem;margin:10px 0 0;min-height:1.3em}
+    footer{font-size:.78rem;color:#536b7c;margin:24px 0 0}a{color:#075986}
+    [hidden]{display:none!important}
+    @media(max-width:820px){.layout{grid-template-columns:1fr}.top{align-items:flex-start}.pill{margin-top:4px}}
+    @media(max-width:520px){main{padding:19px 12px 40px}.panel{padding:17px}.fields{grid-template-columns:1fr}.top{display:block}.pill{display:inline-block;margin-top:12px}.result-head{align-items:start}.actions{flex-wrap:wrap}.actions .button{flex:1}}
+  </style>
+  <script type="module" src="./calculator.mjs"></script>
 </head>
 <body>
-
-    <div class="header">
-        <div class="header-title">
-            <h1>Fena Calculator</h1>
-            <p>Domain: Clinical & Cryptographic AI | Standard: CAP / CLSI / NIST Standards | LabMind-Atlas Architecture</p>
+<main>
+  <header class="top">
+    <div><h1>FENa Calculator</h1><p class="subtitle">Fractional excretion of sodium, fractional excretion of urea, and related urinary indices for clinical education.</p></div>
+    <span class="pill">Calculates locally · No account</span>
+  </header>
+  <div class="layout">
+    <section class="panel" aria-labelledby="input-title">
+      <h2 id="input-title">Patient laboratory values</h2>
+      <form id="calculator-form" novalidate>
+        <div class="fields">
+          <div><label for="urineNa">Urine sodium <span class="unit">(mEq/L)</span></label><input id="urineNa" name="urineNa" data-label="Urine sodium" type="number" min="0" step="any" value="10" required></div>
+          <div><label for="serumNa">Serum sodium <span class="unit">(mEq/L)</span></label><input id="serumNa" name="serumNa" data-label="Serum sodium" type="number" min="0.00001" step="any" value="140" required></div>
+          <div><label for="serumCr">Serum creatinine <span class="unit">(mg/dL)</span></label><input id="serumCr" name="serumCr" data-label="Serum creatinine" type="number" min="0.00001" step="any" value="2" required></div>
+          <div><label for="urineCr">Urine creatinine <span class="unit">(mg/dL)</span></label><input id="urineCr" name="urineCr" data-label="Urine creatinine" type="number" min="0.00001" step="any" value="200" required></div>
         </div>
-        <div>
-            <span class="badge">Air-Gapped Active</span>
-            <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; border-color: #10b981;">Zero-PHI Guard Active</span>
+        <p class="group-heading">Optional additional indices</p>
+        <div class="fields">
+          <div><label for="bun">Blood urea nitrogen <span class="unit">(mg/dL)</span></label><input id="bun" name="bun" data-label="Blood urea nitrogen" type="number" min="0" step="any" placeholder="e.g. 60"><small>For BUN:Cr and FEUrea</small></div>
+          <div><label for="urineUrea">Urine urea nitrogen <span class="unit">(mg/dL)</span></label><input id="urineUrea" name="urineUrea" data-label="Urine urea nitrogen" type="number" min="0" step="any" placeholder="e.g. 1000"><small>Enter BUN as well for FEUrea</small></div>
+          <div><label for="urineOsm">Urine osmolality <span class="unit">(mOsm/kg)</span></label><input id="urineOsm" name="urineOsm" data-label="Urine osmolality" type="number" min="0" step="any" placeholder="e.g. 600"></div>
+          <div><label for="sg">Urine specific gravity</label><input id="sg" name="sg" data-label="Urine specific gravity" type="number" min="1" step="any" placeholder="e.g. 1.025"></div>
         </div>
-    </div>
-
-    <div class="metrics-bar">
-        <div class="metric-box">
-            <div class="metric-label">System Status</div>
-            <div class="metric-val" style="color: var(--success);" id="m-status">OPTIMAL</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">Tasks Processed</div>
-            <div class="metric-val" id="m-tasks">142</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">Audit Blocks Signed</div>
-            <div class="metric-val" id="m-audit">142</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">PHI Interceptions</div>
-            <div class="metric-val" style="color: var(--accent);" id="m-phi">0</div>
-        </div>
-    </div>
-
-    <div class="grid">
-        <div class="card">
-            <h2>⚙️ Dispatch Distributed Component Audit</h2>
-            <div class="form-group">
-                <label>Task / Sample ID</label>
-                <input type="text" id="task_id" value="TASK-2026-LIVE-01">
-            </div>
-            <div class="form-group">
-                <label>Target Identifier</label>
-                <input type="text" id="target_id" value="SPECIMEN-ALPHA-77">
-            </div>
-            <div class="form-group">
-                <label>Primary Measurement / Value</label>
-                <input type="number" id="primary_metric" value="29.4" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Secondary Metric / Kinetic Index</label>
-                <input type="number" id="secondary_metric" value="14.8" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Status / Phenotype Descriptor</label>
-                <input type="text" id="status_descriptor" value="DISCORDANT_ANOMALY">
-            </div>
-            <div class="form-group">
-                <label><input type="checkbox" id="is_critical" checked> Trigger Emergency / Critical Flag</label>
-            </div>
-            <button class="btn" onclick="runAudit()">Execute Distributed Component Audit</button>
-        </div>
-
-        <div class="card">
-            <h2>📊 Real-Time Consensus Dossier & Audit Log</h2>
-            <div class="terminal" id="outputConsole">// Fena Calculator Operations Console Ready
-// Connection established with Air-Gapped Supervisor
-// Cryptographic HMAC-SHA256 audit ledger loaded.
-// Ready for live task payload dispatch...</div>
-        </div>
-    </div>
-
-    <script>
-        async function runAudit() {
-            const consoleEl = document.getElementById('outputConsole');
-            consoleEl.innerText = "// Dispatching task across specialized workers...
-// Invoking InvariantQCWorker, SafetyEscalationWorker, ProtocolWorker...";
-
-            const payload = {
-                task_id: document.getElementById('task_id').value,
-                target_identifier: document.getElementById('target_id').value,
-                primary_metric: parseFloat(document.getElementById('primary_metric').value),
-                secondary_metric: parseFloat(document.getElementById('secondary_metric').value),
-                status_descriptor: document.getElementById('status_descriptor').value,
-                is_critical_flag: document.getElementById('is_critical').checked
-            };
-
-            try {
-                const res = await fetch('/api/audit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                consoleEl.innerText = JSON.stringify(data, null, 2);
-                document.getElementById('m-tasks').innerText = parseInt(document.getElementById('m-tasks').innerText) + 1;
-                document.getElementById('m-audit').innerText = parseInt(document.getElementById('m-audit').innerText) + 1;
-            } catch (err) {
-                consoleEl.innerText = "// Offline / Simulation Output:\n" + JSON.stringify({
-                    dossier_id: "DOSSIER-SIM-" + Math.floor(Math.random()*10000),
-                    system: "fena-calculator",
-                    domain: "Clinical & Cryptographic AI",
-                    task_id: payload.task_id,
-                    overall_urgency: payload.is_critical_flag ? "CRITICAL_STAT_PANIC" : "ELEVATED_RISK",
-                    integrity_status: "DISCORDANT_ANOMALY",
-                    alerts: [
-                        { worker: "InvariantQCWorker", alert: "Primary metric exceeds upper reference bound" },
-                        { worker: "SafetyEscalationWorker", alert: "Critical emergency interlock flag active" }
-                    ],
-                    audit_hash: "HMAC_SHA256_e83f9a72b941d6c381f9"
-                }, null, 2);
-            }
-        }
-    </script>
+        <div class="actions"><button class="button" type="submit">Calculate indices</button><button class="button secondary" type="reset">Reset</button></div>
+        <p id="form-error" class="error" role="alert" aria-live="assertive"></p>
+      </form>
+    </section>
+    <section class="panel" aria-labelledby="result-title">
+      <div class="result-top"><h2 id="result-title">Results</h2><button id="copy-button" class="button secondary" type="button" disabled>Copy summary</button></div>
+      <div id="empty-state" class="empty">Enter laboratory values and select <strong>Calculate indices</strong>.</div>
+      <div id="result-rows" aria-live="polite" aria-relevant="additions text"></div>
+      <div class="advisory"><strong>Clinical interpretation</strong>Thresholds describe classical patterns, not diagnostic certainty. FENa and FEUrea can be misleading in CKD, diuretic exposure, sepsis, glomerular disease, obstruction, and non-oliguric or evolving AKI. Interpret alongside urine microscopy, clinical course, medication history, and volume status. Do not make treatment decisions from these indices alone.</div>
+      <div class="reference"><strong>Formulae</strong><p>FENa (%) = (Urine Na × Serum Cr) / (Serum Na × Urine Cr) × 100</p><p>FEUrea (%) = (Urine urea nitrogen × Serum Cr) / (BUN × Urine Cr) × 100</p><p>Urea measurements must use the same analyte definition and concentration units; creatinine values must share units.</p></div>
+    </section>
+  </div>
+  <footer>Values are processed entirely within this page; no calculation input is submitted to a server or stored by this application. Do not enter patient identifiers. <a href="https://github.com/abusuraihsakhri/fena-calculator">Source repository</a>. Educational tool; not a validated medical device.</footer>
+</main>
 </body>
 </html>
