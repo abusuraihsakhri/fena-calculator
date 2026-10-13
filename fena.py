@@ -63,7 +63,8 @@ def calc_fena(urine_na: float, plasma_cr: float, plasma_na: float,
     if urine_na < 0:
         raise ValueError("Urine sodium cannot be negative")
 
-    fena = (urine_na * plasma_cr) / (plasma_na * urine_cr) * 100.0
+    fena = (urine_na / plasma_na) * (plasma_cr / urine_cr) * 100.0
+    _require_finite(fena=fena)
 
     if fena < 1.0:
         interpretation = "Prerenal azotemia"
@@ -133,7 +134,8 @@ def calc_feurea(urine_urea: float, plasma_cr: float,
     if urine_urea < 0:
         raise ValueError("Urine urea cannot be negative")
 
-    feurea = (urine_urea * plasma_cr) / (plasma_urea * urine_cr) * 100.0
+    feurea = (urine_urea / plasma_urea) * (plasma_cr / urine_cr) * 100.0
+    _require_finite(feurea=feurea)
 
     if feurea < 35.0:
         interpretation = "Prerenal azotemia"
@@ -181,6 +183,7 @@ def calc_bun_cr_ratio(bun: float, creatinine: float) -> Dict[str, Any]:
         raise ValueError("BUN cannot be negative")
 
     ratio = bun / creatinine
+    _require_finite(bun_cr_ratio=ratio)
 
     if ratio > 20:
         interpretation = "Prerenal pattern"
@@ -233,6 +236,7 @@ def interpret_urine_osmolality(urine_osmolality: float,
         raise ValueError("Serum osmolality must be positive")
 
     ratio = urine_osmolality / serum_osmolality
+    _require_finite(osmolality_ratio=ratio)
 
     if urine_osmolality > 500:
         interpretation = "Concentrated urine (prerenal pattern)"
