@@ -70,7 +70,7 @@ def calc_fena(urine_na: float, plasma_cr: float, plasma_na: float,
         etiology = ["Volume depletion/dehydration", "Congestive heart failure",
                      "Hepatorenal syndrome", "Cardiorenal syndrome",
                      "NSAIDs, ACE inhibitors, ARBs"]
-        recommendation = "Likely prerenal. Assess volume status, consider fluid challenge."
+        recommendation = "Low FENa pattern. Correlate with hemodynamics, clinical course, and urine microscopy."
     elif fena <= 2.0:
         interpretation = "Indeterminate"
         etiology = ["Mixed prerenal/intrinsic", "Early ATN",
@@ -94,8 +94,8 @@ def calc_fena(urine_na: float, plasma_cr: float, plasma_na: float,
             "plasma_na_meq_l": plasma_na,
             "urine_cr_mg_dl": urine_cr,
         },
-        "note": ("FENa may be unreliable in patients on diuretics, "
-                 "with CKD, or with contrast nephropathy. Use FEUrea in diuretic-treated patients."),
+        "note": ("FENa does not establish AKI etiology. Diagnostic performance can be limited in CKD, "
+                 "diuretic exposure, sepsis, obstruction, and evolving AKI. FEUrea also has limitations."),
     }
 
 
@@ -155,7 +155,7 @@ def calc_feurea(urine_urea: float, plasma_cr: float,
             "plasma_bun_mg_dl": plasma_urea,
             "urine_cr_mg_dl": urine_cr,
         },
-        "note": "FEUrea is preferred over FENa in patients receiving diuretics.",
+        "note": "FEUrea may be less sensitive to diuretic exposure than FENa, but is not a standalone diagnostic test.",
     }
 
 
@@ -336,11 +336,11 @@ def full_aki_assessment(urine_na: float, plasma_cr: float, plasma_na: float,
             intrinsic_signals += 1
 
     if prerenal_signals > intrinsic_signals:
-        result["overall_assessment"] = "Prerenal azotemia (most likely)"
+        result["overall_assessment"] = "Prerenal pattern (supportive only; not diagnostic)"
     elif intrinsic_signals > prerenal_signals:
-        result["overall_assessment"] = "Intrinsic renal disease (most likely)"
+        result["overall_assessment"] = "Intrinsic renal pattern (supportive only; not diagnostic)"
     else:
-        result["overall_assessment"] = "Indeterminate - further evaluation needed"
+        result["overall_assessment"] = "Indeterminate pattern - integrate with clinical assessment"
 
     return result
 
