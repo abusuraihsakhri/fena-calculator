@@ -23,6 +23,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
+      - name: Install HTTP test client
+        run: python -m pip install 'httpx>=0.28.1'
       - name: Syntax check
         run: python -m compileall -q fena.py cli.py enrichment.py simulator.py agents tests
       - name: Python tests
